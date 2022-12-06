@@ -1,0 +1,105 @@
+From 47058a3f4bba60a1e21a4287f764ce233f541959 Mon Sep 17 00:00:00 2001
+From: Dennis Langenkamp <dennis.langenkamp@alliedvision.com>
+Date: Tue, 22 Nov 2022 14:23:16 +0100
+Subject: [PATCH 19/23] Fixed try format handling
+
+The try format methods were still using the removed v4l2_pad_config. All occurrences are now replaced with  v4l2_subdev_state.
+---
+ drivers/staging/media/imx/imx8-isi-cap.c       | 10 +++++-----
+ drivers/staging/media/imx/imx8-mipi-csi2-sam.c | 14 ++++++--------
+ 2 files changed, 11 insertions(+), 13 deletions(-)
+
+diff --git a/drivers/staging/media/imx/imx8-isi-cap.c b/drivers/staging/media/imx/imx8-isi-cap.c
+index e265021e0ce2..68e338a9b0c5 100644
+--- a/drivers/staging/media/imx/imx8-isi-cap.c
++++ b/drivers/staging/media/imx/imx8-isi-cap.c
+@@ -901,7 +901,7 @@ static int mxc_isi_cap_try_fmt_mplane(struct file *file, void *fh,
+ 	struct mxc_isi_cap_dev *isi_cap = video_drvdata(file);
+ 	struct v4l2_pix_format_mplane *pix = &f->fmt.pix_mp;
+     struct v4l2_subdev_format src_fmt;
+-    struct v4l2_subdev_pad_config *pad_cfg;
++    struct v4l2_subdev_state *sd_state;
+     struct media_pad *source_pad;
+     struct v4l2_subdev *src_sd;
+ 	struct mxc_isi_fmt *fmt;
+@@ -934,15 +934,15 @@ static int mxc_isi_cap_try_fmt_mplane(struct file *file, void *fh,
+     if (!src_sd)
+         return -EINVAL;
+ 
+-    pad_cfg = v4l2_subdev_alloc_pad_config(src_sd);
+-    if (!pad_cfg)
++    sd_state = v4l2_subdev_alloc_state(src_sd);
++    if (!sd_state)
+         return -ENOMEM;
+ 
+     src_fmt.pad = source_pad->index;
+     src_fmt.which = V4L2_SUBDEV_FORMAT_TRY;
+     src_fmt.format.code = fmt->mbus_code;
+     v4l2_fill_mbus_format_mplane(&src_fmt.format,pix);
+-    ret = v4l2_subdev_call(src_sd, pad, set_fmt, pad_cfg, &src_fmt);
++    ret = v4l2_subdev_call(src_sd, pad, set_fmt, sd_state, &src_fmt);
+     if (ret < 0 && ret != -ENOIOCTLCMD)
+     {
+         v4l2_err(&isi_cap->sd, "try remote fmt fail!\n");
+@@ -987,7 +987,7 @@ static int mxc_isi_cap_try_fmt_mplane(struct file *file, void *fh,
+         }
+     }
+ 
+-    v4l2_subdev_free_pad_config(pad_cfg);
++    v4l2_subdev_free_state(sd_state);
+ 
+     if (fmt->colplanes != fmt->memplanes) {
+ 		for (i = 1; i < fmt->colplanes; ++i) {
+diff --git a/drivers/staging/media/imx/imx8-mipi-csi2-sam.c b/drivers/staging/media/imx/imx8-mipi-csi2-sam.c
+index bc82dd45e955..5e97808f612f 100644
+--- a/drivers/staging/media/imx/imx8-mipi-csi2-sam.c
++++ b/drivers/staging/media/imx/imx8-mipi-csi2-sam.c
+@@ -1147,7 +1147,7 @@ static int mipi_csis_set_fmt(struct v4l2_subdev *mipi_sd,
+ 	struct csis_pix_format const *csis_fmt;
+ 	struct media_pad *source_pad;
+ 	struct v4l2_subdev *sen_sd;
+-    struct v4l2_subdev_pad_config *pad_cfg = NULL;
++    struct v4l2_subdev_state *sen_state = NULL;
+ 	int ret;
+ 
+ 	/* Get remote source pad */
+@@ -1166,13 +1166,13 @@ static int mipi_csis_set_fmt(struct v4l2_subdev *mipi_sd,
+ 
+     if (format->which == V4L2_SUBDEV_FORMAT_TRY)
+     {
+-        pad_cfg = v4l2_subdev_alloc_pad_config(sen_sd);
+-        if (!pad_cfg)
++        sen_state = v4l2_subdev_alloc_state(sen_sd);
++        if (!sen_state)
+             return -ENOMEM;
+     }
+ 
+ 	format->pad = source_pad->index;
+-	ret = v4l2_subdev_call(sen_sd, pad, set_fmt, pad_cfg, format);
++	ret = v4l2_subdev_call(sen_sd, pad, set_fmt, sen_state, format);
+ 	if (ret < 0) {
+ 		v4l2_err(&state->sd, "%s, set sensor format fail\n", __func__);
+ 		return -EINVAL;
+@@ -1190,17 +1190,15 @@ static int mipi_csis_set_fmt(struct v4l2_subdev *mipi_sd,
+     }
+     else
+     {
++        v4l2_subdev_free_state(sen_state);
++
+         if (!csis_fmt)
+         {
+             v4l2_err(&state->sd, "%s, find csis format fail\n", __func__);
+             return -EINVAL;
+         }
+-
+-        v4l2_subdev_free_pad_config(pad_cfg);
+     }
+ 
+-	state->csis_fmt = csis_fmt;
+-
+ 	return 0;
+ }
+ 
+-- 
+2.17.1
+

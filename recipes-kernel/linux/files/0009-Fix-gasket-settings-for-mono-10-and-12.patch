@@ -1,0 +1,46 @@
+From 65aa6ec69079920122eb52310cfa89ea166ed7ae Mon Sep 17 00:00:00 2001
+From: Dennis Langenkamp <dennis.langenkamp@alliedvision.com>
+Date: Mon, 14 Nov 2022 12:10:34 +0100
+Subject: [PATCH 09/23] Fix gasket settings for mono 10 and 12
+
+---
+ drivers/staging/media/imx/imx8-mipi-csi2-sam.c | 14 ++------------
+ 1 file changed, 2 insertions(+), 12 deletions(-)
+
+diff --git a/drivers/staging/media/imx/imx8-mipi-csi2-sam.c b/drivers/staging/media/imx/imx8-mipi-csi2-sam.c
+index 07b0c9176877..849c6c1659ae 100644
+--- a/drivers/staging/media/imx/imx8-mipi-csi2-sam.c
++++ b/drivers/staging/media/imx/imx8-mipi-csi2-sam.c
+@@ -973,27 +973,17 @@ static void disp_mix_gasket_config(struct csi_state *state)
+ 	case MEDIA_BUS_FMT_SBGGR8_1X8:
+ 		fmt_val = GASKET_0_CTRL_DATA_TYPE_RAW8;
+ 		break;
++    case MEDIA_BUS_FMT_Y10_1X10:
+ 	case MEDIA_BUS_FMT_SBGGR10_1X10:
+-		fmt_val = GASKET_0_CTRL_DATA_TYPE_RAW10;
+-		break;
+ 	case MEDIA_BUS_FMT_SGBRG10_1X10:
+-		fmt_val = GASKET_0_CTRL_DATA_TYPE_RAW10;
+-		break;
+ 	case MEDIA_BUS_FMT_SGRBG10_1X10:
+-		fmt_val = GASKET_0_CTRL_DATA_TYPE_RAW10;
+-		break;
+ 	case MEDIA_BUS_FMT_SRGGB10_1X10:
+ 		fmt_val = GASKET_0_CTRL_DATA_TYPE_RAW10;
+ 		break;
++    case MEDIA_BUS_FMT_Y12_1X12:
+ 	case MEDIA_BUS_FMT_SBGGR12_1X12:
+-		fmt_val = GASKET_0_CTRL_DATA_TYPE_RAW12;
+-		break;
+ 	case MEDIA_BUS_FMT_SGBRG12_1X12:
+-		fmt_val = GASKET_0_CTRL_DATA_TYPE_RAW12;
+-		break;
+ 	case MEDIA_BUS_FMT_SGRBG12_1X12:
+-		fmt_val = GASKET_0_CTRL_DATA_TYPE_RAW12;
+-		break;
+ 	case MEDIA_BUS_FMT_SRGGB12_1X12:
+ 		fmt_val = GASKET_0_CTRL_DATA_TYPE_RAW12;
+ 		break;
+-- 
+2.17.1
+

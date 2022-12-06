@@ -1,0 +1,28 @@
+From 20080fa5fc2b933d69219e1f947e38c21ee40c4c Mon Sep 17 00:00:00 2001
+From: Dennis Langenkamp <dennis.langenkamp@alliedvision.com>
+Date: Fri, 25 Nov 2022 08:49:12 +0100
+Subject: [PATCH 22/23] mipi csi: Try to increase data rate by using another
+ clock source
+
+---
+ arch/arm64/boot/dts/freescale/imx8mp.dtsi | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/arch/arm64/boot/dts/freescale/imx8mp.dtsi b/arch/arm64/boot/dts/freescale/imx8mp.dtsi
+index 7e71a112c618..39e36e92c016 100644
+--- a/arch/arm64/boot/dts/freescale/imx8mp.dtsi
++++ b/arch/arm64/boot/dts/freescale/imx8mp.dtsi
+@@ -1623,8 +1623,8 @@
+ 						      "media_blk_csi_pclk",
+ 						      "media_blk_csi_aclk";
+ 					assigned-clocks = <&clk IMX8MP_CLK_MEDIA_CAM2_PIX>;
+-					assigned-clock-parents = <&clk IMX8MP_SYS_PLL1_266M>;
+-					assigned-clock-rates = <266000000>;
++					assigned-clock-parents = <&clk IMX8MP_SYS_PLL2_1000M>;
++					assigned-clock-rates = <500000000>;
+ 					bus-width = <4>;
+ 					csi-gpr = <&mediamix_gasket1>;
+ 					gpr = <&media_blk_ctrl>;
+-- 
+2.17.1
+

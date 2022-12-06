@@ -1,0 +1,84 @@
+From e9d839b4f4a58c83a18759bbb0e87608f09c2bb5 Mon Sep 17 00:00:00 2001
+From: Dennis Langenkamp <dennis.langenkamp@alliedvision.com>
+Date: Fri, 11 Nov 2022 09:58:52 +0100
+Subject: [PATCH 02/23] Added pixelformat GREY8.
+
+---
+ drivers/staging/media/imx/imx8-isi-cap.c       |  3 ++-
+ drivers/staging/media/imx/imx8-isi-fmt.c       | 12 +++++++++++-
+ drivers/staging/media/imx/imx8-mipi-csi2-sam.c |  8 +++++++-
+ 3 files changed, 20 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/staging/media/imx/imx8-isi-cap.c b/drivers/staging/media/imx/imx8-isi-cap.c
+index 41caec98113a..fe322e4f4637 100644
+--- a/drivers/staging/media/imx/imx8-isi-cap.c
++++ b/drivers/staging/media/imx/imx8-isi-cap.c
+@@ -967,7 +967,8 @@ static int mxc_isi_source_fmt_init(struct mxc_isi_cap_dev *isi_cap)
+ 	}
+ 
+ 	/* Pixel link master will transfer format to RGB32 or YUV32 */
+-	src_f->fmt = mxc_isi_get_src_fmt(&src_fmt);
++	//src_f->fmt = mxc_isi_get_src_fmt(&src_fmt);
++    src_f->fmt = dst_f->fmt;
+ 
+ 	set_frame_bounds(src_f, src_fmt.format.width, src_fmt.format.height);
+ 
+diff --git a/drivers/staging/media/imx/imx8-isi-fmt.c b/drivers/staging/media/imx/imx8-isi-fmt.c
+index db11c809a3d3..e7c4aec0f395 100644
+--- a/drivers/staging/media/imx/imx8-isi-fmt.c
++++ b/drivers/staging/media/imx/imx8-isi-fmt.c
+@@ -97,7 +97,17 @@ struct mxc_isi_fmt mxc_isi_out_formats[] = {
+ 		.colplanes	= 1,
+ 		.align		= 2,
+ 		.mbus_code	= MEDIA_BUS_FMT_RGB888_1X24,
+-	}
++	},
++    //AVT additional format definition
++    {
++            .name		= "GREY",
++            .fourcc		= V4L2_PIX_FMT_GREY,
++            .depth		= { 8 },
++            .color		= MXC_ISI_OUT_FMT_RAW8,
++            .memplanes	= 1,
++            .colplanes	= 1,
++            .mbus_code	= MEDIA_BUS_FMT_Y8_1X8,
++    }
+ };
+ 
+ size_t mxc_isi_out_formats_size = ARRAY_SIZE(mxc_isi_out_formats);
+diff --git a/drivers/staging/media/imx/imx8-mipi-csi2-sam.c b/drivers/staging/media/imx/imx8-mipi-csi2-sam.c
+index 67556b8a000b..a7785cc66934 100644
+--- a/drivers/staging/media/imx/imx8-mipi-csi2-sam.c
++++ b/drivers/staging/media/imx/imx8-mipi-csi2-sam.c
+@@ -504,6 +504,12 @@ static const struct csis_pix_format mipi_csis_formats[] = {
+ 		.fmt_reg = MIPI_CSIS_ISPCFG_FMT_RAW12,
+ 		.data_alignment = 16,
+ 	},
++    //AVT additional format definition
++    {
++        .code = MEDIA_BUS_FMT_Y8_1X8,
++        .fmt_reg = MIPI_CSIS_ISPCFG_FMT_RAW8,
++        .data_alignment = 8,
++    },
+ };
+ 
+ #define mipi_csis_write(__csis, __r, __v) writel(__v, __csis->regs + __r)
+@@ -952,6 +958,7 @@ static void disp_mix_gasket_config(struct csi_state *state)
+ 	case MEDIA_BUS_FMT_VYUY8_2X8:
+ 		fmt_val = GASKET_0_CTRL_DATA_TYPE_YUV422_8;
+ 		break;
++    case MEDIA_BUS_FMT_Y8_1X8:
+ 	case MEDIA_BUS_FMT_SBGGR8_1X8:
+ 		fmt_val = GASKET_0_CTRL_DATA_TYPE_RAW8;
+ 		break;
+@@ -1137,7 +1144,6 @@ static int mipi_csis_set_fmt(struct v4l2_subdev *mipi_sd,
+ 	}
+ 
+ 	format->pad = source_pad->index;
+-	//mf->code = MEDIA_BUS_FMT_UYVY8_2X8;
+ 	ret = v4l2_subdev_call(sen_sd, pad, set_fmt, NULL, format);
+ 	if (ret < 0) {
+ 		v4l2_err(&state->sd, "%s, set sensor format fail\n", __func__);
+-- 
+2.17.1
+

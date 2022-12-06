@@ -1,0 +1,39 @@
+From 832fdd703ad5520c6cebde5fcc58a0c0e65b9275 Mon Sep 17 00:00:00 2001
+From: Dennis Langenkamp <dennis.langenkamp@alliedvision.com>
+Date: Mon, 14 Nov 2022 11:26:21 +0100
+Subject: [PATCH 08/23] Added additional 10 and 12 bit mono formats
+
+---
+ drivers/staging/media/imx/imx8-mipi-csi2-sam.c | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
+
+diff --git a/drivers/staging/media/imx/imx8-mipi-csi2-sam.c b/drivers/staging/media/imx/imx8-mipi-csi2-sam.c
+index bab9751b2ae2..07b0c9176877 100644
+--- a/drivers/staging/media/imx/imx8-mipi-csi2-sam.c
++++ b/drivers/staging/media/imx/imx8-mipi-csi2-sam.c
+@@ -505,11 +505,22 @@ static const struct csis_pix_format mipi_csis_formats[] = {
+ 		.data_alignment = 16,
+ 	},
+     //AVT additional format definition
++    //Mono formats
+     {
+         .code = MEDIA_BUS_FMT_Y8_1X8,
+         .fmt_reg = MIPI_CSIS_ISPCFG_FMT_RAW8,
+         .data_alignment = 8,
+     },
++    {
++        .code = MEDIA_BUS_FMT_Y10_1X10,
++        .fmt_reg = MIPI_CSIS_ISPCFG_FMT_RAW10,
++        .data_alignment = 16,
++    },
++    {
++        .code = MEDIA_BUS_FMT_Y12_1X12,
++        .fmt_reg = MIPI_CSIS_ISPCFG_FMT_RAW12,
++        .data_alignment = 16,
++    },
+ };
+ 
+ #define mipi_csis_write(__csis, __r, __v) writel(__v, __csis->regs + __r)
+-- 
+2.17.1
+

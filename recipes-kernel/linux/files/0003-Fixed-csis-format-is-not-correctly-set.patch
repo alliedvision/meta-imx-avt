@@ -1,0 +1,24 @@
+From 3bda4b6850f521bd3f7f70cee479cdbc831637a2 Mon Sep 17 00:00:00 2001
+From: Dennis Langenkamp <dennis.langenkamp@alliedvision.com>
+Date: Fri, 11 Nov 2022 11:29:06 +0100
+Subject: [PATCH 03/23] Fixed csis format is not correctly set
+
+---
+ drivers/staging/media/imx/imx8-mipi-csi2-sam.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/drivers/staging/media/imx/imx8-mipi-csi2-sam.c b/drivers/staging/media/imx/imx8-mipi-csi2-sam.c
+index a7785cc66934..20612de3557c 100644
+--- a/drivers/staging/media/imx/imx8-mipi-csi2-sam.c
++++ b/drivers/staging/media/imx/imx8-mipi-csi2-sam.c
+@@ -1155,6 +1155,7 @@ static int mipi_csis_set_fmt(struct v4l2_subdev *mipi_sd,
+ 		csis_fmt = &mipi_csis_formats[0];
+ 		mf->code = csis_fmt->code;
+ 	}
++    state->csis_fmt = csis_fmt;
+ 
+ 	state->csis_fmt = csis_fmt;
+ 
+-- 
+2.17.1
+

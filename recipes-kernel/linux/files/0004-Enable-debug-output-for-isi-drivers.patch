@@ -1,0 +1,52 @@
+From 6640f98e17affc6928cd0f370823642ac874ad20 Mon Sep 17 00:00:00 2001
+From: Dennis Langenkamp <dennis.langenkamp@alliedvision.com>
+Date: Fri, 11 Nov 2022 12:25:20 +0100
+Subject: [PATCH 04/23] Enable debug output for isi drivers
+
+---
+ drivers/staging/media/imx/imx8-isi-cap.c  | 1 +
+ drivers/staging/media/imx/imx8-isi-core.c | 2 ++
+ drivers/staging/media/imx/imx8-isi-hw.c   | 2 ++
+ 3 files changed, 5 insertions(+)
+
+diff --git a/drivers/staging/media/imx/imx8-isi-cap.c b/drivers/staging/media/imx/imx8-isi-cap.c
+index fe322e4f4637..2a02ce9f80b9 100644
+--- a/drivers/staging/media/imx/imx8-isi-cap.c
++++ b/drivers/staging/media/imx/imx8-isi-cap.c
+@@ -8,6 +8,7 @@
+  * Copyright 2019-2021 NXP
+  *
+  */
++#define DEBUG 1
+ 
+ #include <linux/module.h>
+ #include <linux/kernel.h>
+diff --git a/drivers/staging/media/imx/imx8-isi-core.c b/drivers/staging/media/imx/imx8-isi-core.c
+index 8f71f263112e..38ed296ec719 100644
+--- a/drivers/staging/media/imx/imx8-isi-core.c
++++ b/drivers/staging/media/imx/imx8-isi-core.c
+@@ -4,6 +4,8 @@
+  *
+  */
+ 
++#define DEBUG 1
++
+ #include "imx8-isi-hw.h"
+ 
+ static const struct soc_device_attribute imx8_soc[] = {
+diff --git a/drivers/staging/media/imx/imx8-isi-hw.c b/drivers/staging/media/imx/imx8-isi-hw.c
+index 193ff5c5fd33..7e981ddf33e9 100644
+--- a/drivers/staging/media/imx/imx8-isi-hw.c
++++ b/drivers/staging/media/imx/imx8-isi-hw.c
+@@ -3,6 +3,8 @@
+  * Copyright 2019-2020 NXP
+  *
+  */
++#define DEBUG 1
++
+ #include <dt-bindings/pinctrl/pads-imx8qxp.h>
+ 
+ #include <linux/module.h>
+-- 
+2.17.1
+

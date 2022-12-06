@@ -1,0 +1,47 @@
+From a2a0ab1e50574e7e840969874d8e95cf1cbdc8b8 Mon Sep 17 00:00:00 2001
+From: Dennis Langenkamp <dennis.langenkamp@alliedvision.com>
+Date: Mon, 14 Nov 2022 12:55:01 +0100
+Subject: [PATCH 10/23] Added 8, 10 and 12 bit bayer formats
+
+---
+ drivers/staging/media/imx/imx8-mipi-csi2-sam.c | 17 +++++++++++++++++
+ 1 file changed, 17 insertions(+)
+
+diff --git a/drivers/staging/media/imx/imx8-mipi-csi2-sam.c b/drivers/staging/media/imx/imx8-mipi-csi2-sam.c
+index 849c6c1659ae..22d32e5a5a40 100644
+--- a/drivers/staging/media/imx/imx8-mipi-csi2-sam.c
++++ b/drivers/staging/media/imx/imx8-mipi-csi2-sam.c
+@@ -521,6 +521,20 @@ static const struct csis_pix_format mipi_csis_formats[] = {
+         .fmt_reg = MIPI_CSIS_ISPCFG_FMT_RAW12,
+         .data_alignment = 16,
+     },
++    //Bayer 8-bit
++    {
++        .code = MEDIA_BUS_FMT_SGBRG8_1X8,
++        .fmt_reg = MIPI_CSIS_ISPCFG_FMT_RAW8,
++        .data_alignment = 8,
++    }, {
++        .code = MEDIA_BUS_FMT_SGRBG8_1X8,
++        .fmt_reg = MIPI_CSIS_ISPCFG_FMT_RAW8,
++        .data_alignment = 8,
++    }, {
++        .code = MEDIA_BUS_FMT_SRGGB8_1X8,
++        .fmt_reg = MIPI_CSIS_ISPCFG_FMT_RAW8,
++        .data_alignment = 8,
++    },
+ };
+ 
+ #define mipi_csis_write(__csis, __r, __v) writel(__v, __csis->regs + __r)
+@@ -971,6 +985,9 @@ static void disp_mix_gasket_config(struct csi_state *state)
+ 		break;
+     case MEDIA_BUS_FMT_Y8_1X8:
+ 	case MEDIA_BUS_FMT_SBGGR8_1X8:
++    case MEDIA_BUS_FMT_SGBRG8_1X8:
++    case MEDIA_BUS_FMT_SGRBG8_1X8:
++    case MEDIA_BUS_FMT_SRGGB8_1X8:
+ 		fmt_val = GASKET_0_CTRL_DATA_TYPE_RAW8;
+ 		break;
+     case MEDIA_BUS_FMT_Y10_1X10:
+-- 
+2.17.1
+

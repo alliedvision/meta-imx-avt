@@ -1,0 +1,37 @@
+From 345403e63942624a2f5f033f38ef92b00db3eddb Mon Sep 17 00:00:00 2001
+From: Dennis Langenkamp <dennis.langenkamp@alliedvision.com>
+Date: Thu, 17 Nov 2022 16:49:26 +0100
+Subject: [PATCH 17/23] Code cleanup: Removed blank lines.
+
+---
+ drivers/staging/media/imx/imx8-isi-core.c | 1 -
+ drivers/staging/media/imx/imx8-isi-hw.c   | 1 -
+ 2 files changed, 2 deletions(-)
+
+diff --git a/drivers/staging/media/imx/imx8-isi-core.c b/drivers/staging/media/imx/imx8-isi-core.c
+index bd8843024c6b..8f71f263112e 100644
+--- a/drivers/staging/media/imx/imx8-isi-core.c
++++ b/drivers/staging/media/imx/imx8-isi-core.c
+@@ -4,7 +4,6 @@
+  *
+  */
+ 
+-
+ #include "imx8-isi-hw.h"
+ 
+ static const struct soc_device_attribute imx8_soc[] = {
+diff --git a/drivers/staging/media/imx/imx8-isi-hw.c b/drivers/staging/media/imx/imx8-isi-hw.c
+index 8b505358d7e2..193ff5c5fd33 100644
+--- a/drivers/staging/media/imx/imx8-isi-hw.c
++++ b/drivers/staging/media/imx/imx8-isi-hw.c
+@@ -3,7 +3,6 @@
+  * Copyright 2019-2020 NXP
+  *
+  */
+-
+ #include <dt-bindings/pinctrl/pads-imx8qxp.h>
+ 
+ #include <linux/module.h>
+-- 
+2.17.1
+

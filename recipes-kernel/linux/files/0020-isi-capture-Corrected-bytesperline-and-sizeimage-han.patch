@@ -1,0 +1,107 @@
+From 0a0874126ea42f0ce6b1f4a282e0e4ea788cd7cf Mon Sep 17 00:00:00 2001
+From: Dennis Langenkamp <dennis.langenkamp@alliedvision.com>
+Date: Thu, 24 Nov 2022 11:47:00 +0100
+Subject: [PATCH 20/23] isi capture: Corrected bytesperline and sizeimage
+ handling
+
+Until now the the fields bytesperline and sizeimage of the ioctl VIDIOC_S_FMT were only calculated, when they were set to zero. It was not checked if the supply values of bytesperline and sizeimage were large enough to store an complete image. So it could happen, that to small buffer were allocated.
+---
+ drivers/staging/media/imx/imx8-isi-cap.c | 59 ++++++------------------
+ 1 file changed, 13 insertions(+), 46 deletions(-)
+
+diff --git a/drivers/staging/media/imx/imx8-isi-cap.c b/drivers/staging/media/imx/imx8-isi-cap.c
+index 68e338a9b0c5..b410a15d14ce 100644
+--- a/drivers/staging/media/imx/imx8-isi-cap.c
++++ b/drivers/staging/media/imx/imx8-isi-cap.c
+@@ -905,7 +905,7 @@ static int mxc_isi_cap_try_fmt_mplane(struct file *file, void *fh,
+     struct media_pad *source_pad;
+     struct v4l2_subdev *src_sd;
+ 	struct mxc_isi_fmt *fmt;
+-	int bpl;
++	u32 bpl,min_bpl;
+ 	int i;
+     int ret = 0;
+ 
+@@ -958,7 +958,7 @@ static int mxc_isi_cap_try_fmt_mplane(struct file *file, void *fh,
+          * 16(128/8)
+          */
+         v4l_bound_align_image(&pix->width, 16, ISI_4K, fmt->align,
+-                              &pix->height, 16, ISI_4K, 1, 0);
++                              &pix->height, 16, ISI_8K, 1, 0);
+ 
+         pix->num_planes = fmt->memplanes;
+         pix->pixelformat = fmt->fourcc;
+@@ -968,22 +968,19 @@ static int mxc_isi_cap_try_fmt_mplane(struct file *file, void *fh,
+         pix->quantization = V4L2_QUANTIZATION_FULL_RANGE;
+         memset(pix->reserved, 0x00, sizeof(pix->reserved));
+ 
+-        for (i = 0; i < pix->num_planes; i++) {
++        for (i = 0; i < fmt->colplanes; i++) {
+             bpl = pix->plane_fmt[i].bytesperline;
++            min_bpl = (pix->width * fmt->depth[i]) >> 3;
++
++            // The size of LINE_PITCH in CHNL_OUT_BUF_PITCH is 16bit
++            // So the maximum value here must be U16_MAX
++            pix->plane_fmt[i].bytesperline = clamp(bpl,min_bpl,U16_MAX);
+ 
+-            if ((bpl == 0) || (bpl / (fmt->depth[i] >> 3)) < pix->width)
+-                pix->plane_fmt[i].bytesperline =
+-                        (pix->width * fmt->depth[i]) >> 3;
+-
+-            if (pix->plane_fmt[i].sizeimage == 0) {
+-                if ((i == 1) && (pix->pixelformat == V4L2_PIX_FMT_NV12 ||
+-                         pix->pixelformat == V4L2_PIX_FMT_NV12M))
+-                    pix->plane_fmt[i].sizeimage =
+-                      (pix->width * (pix->height >> 1) * fmt->depth[i] >> 3);
+-                else
+-                    pix->plane_fmt[i].sizeimage =
+-                        (pix->width * pix->height * fmt->depth[i] >> 3);
+-            }
++            if ((i == 1) && (pix->pixelformat == V4L2_PIX_FMT_NV12 ||
++                             pix->pixelformat == V4L2_PIX_FMT_NV12M))
++                pix->plane_fmt[i].sizeimage = (pix->plane_fmt[i].bytesperline * (pix->height >> 1));
++            else
++                pix->plane_fmt[i].sizeimage = (pix->plane_fmt[i].bytesperline * pix->height);
+         }
+     }
+ 
+@@ -1102,36 +1099,6 @@ static int mxc_isi_cap_s_fmt_mplane(struct file *file, void *priv,
+ 	dst_f->height = pix->height;
+ 	dst_f->width = pix->width;
+ 
+-	pix->num_planes = fmt->memplanes;
+-
+-	for (i = 0; i < fmt->colplanes; i++) {
+-		bpl = pix->plane_fmt[i].bytesperline;
+-
+-		if ((bpl == 0) || (bpl / (fmt->depth[i] >> 3)) < pix->width)
+-			pix->plane_fmt[i].bytesperline =
+-					(pix->width * fmt->depth[i]) >> 3;
+-
+-		if (pix->plane_fmt[i].sizeimage == 0) {
+-			if ((i == 1) && (pix->pixelformat == V4L2_PIX_FMT_NV12 ||
+-					 pix->pixelformat == V4L2_PIX_FMT_NV12M))
+-				pix->plane_fmt[i].sizeimage =
+-				  (pix->width * (pix->height >> 1) * fmt->depth[i] >> 3);
+-			else
+-				pix->plane_fmt[i].sizeimage =
+-					(pix->width * pix->height * fmt->depth[i] >> 3);
+-		}
+-	}
+-
+-	if (fmt->colplanes != fmt->memplanes) {
+-		for (i = 1; i < fmt->colplanes; ++i) {
+-			struct v4l2_plane_pix_format *plane = &pix->plane_fmt[i];
+-
+-			pix->plane_fmt[0].sizeimage += plane->sizeimage;
+-			plane->bytesperline = 0;
+-			plane->sizeimage = 0;
+-		}
+-	}
+-
+ 	for (i = 0; i < pix->num_planes; i++) {
+ 		dst_f->bytesperline[i] = pix->plane_fmt[i].bytesperline;
+ 		dst_f->sizeimage[i]    = pix->plane_fmt[i].sizeimage;
+-- 
+2.17.1
+

@@ -1,0 +1,40 @@
+From e4b91f36f5da4a6ea18e9039eb3c37a67820e1f3 Mon Sep 17 00:00:00 2001
+From: Dennis Langenkamp <dennis.langenkamp@alliedvision.com>
+Date: Thu, 10 Nov 2022 14:41:45 +0100
+Subject: [PATCH 01/23] Use for every pixelformat the corresponding mbus format
+ instead of always YUV.
+
+---
+ drivers/staging/media/imx/imx8-isi-cap.c       | 2 +-
+ drivers/staging/media/imx/imx8-mipi-csi2-sam.c | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/staging/media/imx/imx8-isi-cap.c b/drivers/staging/media/imx/imx8-isi-cap.c
+index 6f83ba47f919..41caec98113a 100644
+--- a/drivers/staging/media/imx/imx8-isi-cap.c
++++ b/drivers/staging/media/imx/imx8-isi-cap.c
+@@ -948,7 +948,7 @@ static int mxc_isi_source_fmt_init(struct mxc_isi_cap_dev *isi_cap)
+ 
+ 	src_fmt.pad = source_pad->index;
+ 	src_fmt.which = V4L2_SUBDEV_FORMAT_ACTIVE;
+-	src_fmt.format.code = MEDIA_BUS_FMT_UYVY8_2X8;
++	src_fmt.format.code = dst_f->fmt->mbus_code;
+ 	src_fmt.format.width = dst_f->width;
+ 	src_fmt.format.height = dst_f->height;
+ 	ret = v4l2_subdev_call(src_sd, pad, set_fmt, NULL, &src_fmt);
+diff --git a/drivers/staging/media/imx/imx8-mipi-csi2-sam.c b/drivers/staging/media/imx/imx8-mipi-csi2-sam.c
+index 1d12365520a6..67556b8a000b 100644
+--- a/drivers/staging/media/imx/imx8-mipi-csi2-sam.c
++++ b/drivers/staging/media/imx/imx8-mipi-csi2-sam.c
+@@ -1137,7 +1137,7 @@ static int mipi_csis_set_fmt(struct v4l2_subdev *mipi_sd,
+ 	}
+ 
+ 	format->pad = source_pad->index;
+-	mf->code = MEDIA_BUS_FMT_UYVY8_2X8;
++	//mf->code = MEDIA_BUS_FMT_UYVY8_2X8;
+ 	ret = v4l2_subdev_call(sen_sd, pad, set_fmt, NULL, format);
+ 	if (ret < 0) {
+ 		v4l2_err(&state->sd, "%s, set sensor format fail\n", __func__);
+-- 
+2.17.1
+

@@ -1,0 +1,27 @@
+From e5d1fd888bd44b9977319eda34d368d43faf68b1 Mon Sep 17 00:00:00 2001
+From: Dennis Langenkamp <dennis.langenkamp@alliedvision.com>
+Date: Fri, 11 Nov 2022 13:35:30 +0100
+Subject: [PATCH 05/23] Fix gasket settings
+
+---
+ drivers/staging/media/imx/imx8-mipi-csi2-sam.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/drivers/staging/media/imx/imx8-mipi-csi2-sam.c b/drivers/staging/media/imx/imx8-mipi-csi2-sam.c
+index 20612de3557c..206d3fdd979e 100644
+--- a/drivers/staging/media/imx/imx8-mipi-csi2-sam.c
++++ b/drivers/staging/media/imx/imx8-mipi-csi2-sam.c
+@@ -992,8 +992,10 @@ static void disp_mix_gasket_config(struct csi_state *state)
+ 	}
+ 
+ 	regmap_read(gasket, DISP_MIX_GASKET_0_CTRL, &val);
++    val &= ~(GASKET_0_CTRL_DATA_TYPE_MASK | GASKET_0_CTRL_DUAL_COMP_ENABLE);
+ 	if (fmt_val == GASKET_0_CTRL_DATA_TYPE_YUV422_8)
+ 		val |= GASKET_0_CTRL_DUAL_COMP_ENABLE;
++
+ 	val |= GASKET_0_CTRL_DATA_TYPE(fmt_val);
+ 	regmap_write(gasket, DISP_MIX_GASKET_0_CTRL, val);
+ 
+-- 
+2.17.1
+

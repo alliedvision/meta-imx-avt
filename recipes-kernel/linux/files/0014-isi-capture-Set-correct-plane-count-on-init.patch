@@ -1,0 +1,26 @@
+From 99bc68df4da2adf38661bcb432fb34694f26717c Mon Sep 17 00:00:00 2001
+From: Dennis Langenkamp <dennis.langenkamp@alliedvision.com>
+Date: Thu, 17 Nov 2022 09:33:24 +0100
+Subject: [PATCH 14/23] isi capture: Set correct plane count on init.
+
+---
+ drivers/staging/media/imx/imx8-isi-cap.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/drivers/staging/media/imx/imx8-isi-cap.c b/drivers/staging/media/imx/imx8-isi-cap.c
+index 2867b12d7871..2d850f1135a5 100644
+--- a/drivers/staging/media/imx/imx8-isi-cap.c
++++ b/drivers/staging/media/imx/imx8-isi-cap.c
+@@ -697,6 +697,9 @@ static int isi_cap_fmt_init(struct mxc_isi_cap_dev *isi_cap)
+ 	if (!dst_f->fmt)
+     {
+         dst_f->fmt = &mxc_isi_out_formats[0];
++        isi_cap->pix.num_planes = dst_f->fmt->memplanes;
++        isi_cap->pix.width = dst_f->width;
++        isi_cap->pix.height = dst_f->height;
+ 
+         memset(&src_fmt, 0, sizeof(src_fmt));
+         src_fmt.pad = source_pad->index;
+-- 
+2.17.1
+

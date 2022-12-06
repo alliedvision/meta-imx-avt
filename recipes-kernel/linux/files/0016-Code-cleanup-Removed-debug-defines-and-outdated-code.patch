@@ -1,0 +1,58 @@
+From 6ec56991af9e7e5c32b15545939fa094f9a27b68 Mon Sep 17 00:00:00 2001
+From: Dennis Langenkamp <dennis.langenkamp@alliedvision.com>
+Date: Thu, 17 Nov 2022 16:47:31 +0100
+Subject: [PATCH 16/23] Code cleanup: Removed debug defines and outdated code.
+
+---
+ drivers/staging/media/imx/imx8-isi-cap.c  | 2 --
+ drivers/staging/media/imx/imx8-isi-core.c | 1 -
+ drivers/staging/media/imx/imx8-isi-hw.c   | 1 -
+ 3 files changed, 4 deletions(-)
+
+diff --git a/drivers/staging/media/imx/imx8-isi-cap.c b/drivers/staging/media/imx/imx8-isi-cap.c
+index ad6281cb7f1b..f8673999f684 100644
+--- a/drivers/staging/media/imx/imx8-isi-cap.c
++++ b/drivers/staging/media/imx/imx8-isi-cap.c
+@@ -8,7 +8,6 @@
+  * Copyright 2019-2021 NXP
+  *
+  */
+-#define DEBUG 1
+ 
+ #include <linux/module.h>
+ #include <linux/kernel.h>
+@@ -1045,7 +1044,6 @@ static int mxc_isi_source_fmt_init(struct mxc_isi_cap_dev *isi_cap)
+ 	}
+ 
+ 	/* Pixel link master will transfer format to RGB32 or YUV32 */
+-	//src_f->fmt = mxc_isi_get_src_fmt(&src_fmt);
+     src_f->fmt = dst_f->fmt;
+ 
+ 	set_frame_bounds(src_f, src_fmt.format.width, src_fmt.format.height);
+diff --git a/drivers/staging/media/imx/imx8-isi-core.c b/drivers/staging/media/imx/imx8-isi-core.c
+index 38ed296ec719..bd8843024c6b 100644
+--- a/drivers/staging/media/imx/imx8-isi-core.c
++++ b/drivers/staging/media/imx/imx8-isi-core.c
+@@ -4,7 +4,6 @@
+  *
+  */
+ 
+-#define DEBUG 1
+ 
+ #include "imx8-isi-hw.h"
+ 
+diff --git a/drivers/staging/media/imx/imx8-isi-hw.c b/drivers/staging/media/imx/imx8-isi-hw.c
+index 7e981ddf33e9..8b505358d7e2 100644
+--- a/drivers/staging/media/imx/imx8-isi-hw.c
++++ b/drivers/staging/media/imx/imx8-isi-hw.c
+@@ -3,7 +3,6 @@
+  * Copyright 2019-2020 NXP
+  *
+  */
+-#define DEBUG 1
+ 
+ #include <dt-bindings/pinctrl/pads-imx8qxp.h>
+ 
+-- 
+2.17.1
+

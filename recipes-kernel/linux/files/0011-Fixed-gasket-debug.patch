@@ -1,0 +1,29 @@
+From af15faef41d0821e810cda0ff1530bb0718b8ff2 Mon Sep 17 00:00:00 2001
+From: Dennis Langenkamp <dennis.langenkamp@alliedvision.com>
+Date: Tue, 15 Nov 2022 09:06:48 +0100
+Subject: [PATCH 11/23] Fixed gasket debug
+
+---
+ drivers/staging/media/imx/imx8-mipi-csi2-sam.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/staging/media/imx/imx8-mipi-csi2-sam.c b/drivers/staging/media/imx/imx8-mipi-csi2-sam.c
+index 22d32e5a5a40..bc82dd45e955 100644
+--- a/drivers/staging/media/imx/imx8-mipi-csi2-sam.c
++++ b/drivers/staging/media/imx/imx8-mipi-csi2-sam.c
+@@ -586,9 +586,9 @@ static void dump_gasket_regs(struct csi_state *state, const char *label)
+ 		u32 offset;
+ 		const char * const name;
+ 	} registers[] = {
+-		{ 0x60, "GPR_GASKET_0_CTRL" },
+-		{ 0x64, "GPR_GASKET_0_HSIZE" },
+-		{ 0x68, "GPR_GASKET_0_VSIZE" },
++		{ DISP_MIX_GASKET_0_CTRL, "GPR_GASKET_0_CTRL" },
++		{ DISP_MIX_GASKET_0_HSIZE, "GPR_GASKET_0_HSIZE" },
++		{ DISP_MIX_GASKET_0_VSIZE, "GPR_GASKET_0_VSIZE" },
+ 	};
+ 	u32 i, cfg;
+ 
+-- 
+2.17.1
+
