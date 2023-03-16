@@ -22,6 +22,8 @@ SRC_URI += " \
            	file://0019-Fixed-try-format-handling.patch \
            	file://0020-isi-capture-Corrected-bytesperline-and-sizeimage-han.patch \
            	file://0022-mipi-csi-Try-to-increase-data-rate-by-using-another-.patch \
+           	file://0024-Fixed-v4l2-priority-is-shared-between-all-csi-video-.patch \
+           	file://0025-GenICam-for-CSI2-for-the-i.MX8M-Plus.patch \
           "
 
 
