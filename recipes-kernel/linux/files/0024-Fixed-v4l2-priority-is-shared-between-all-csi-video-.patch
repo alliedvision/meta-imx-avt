@@ -1,0 +1,93 @@
+From c8ba12e08ee67dcb7240662a9dae92a5d913f9c6 Mon Sep 17 00:00:00 2001
+From: Dennis Langenkamp <dennis.langenkamp@alliedvision.com>
+Date: Wed, 15 Mar 2023 11:24:22 +0100
+Subject: [PATCH 24/25] Fixed v4l2 priority is shared between all csi video
+ devices
+
+The v4l2 priority value was shared between all csi video device. If two camera were used and for one of them the v4l2 priority was set to the maximum the other couldn't be accessed anymore, because the priority value of the first camera was also applied for the second.
+The priority is now bound to the isi device, so now every video device has its now priority value and can be used independently. The media device driver iterates over all devices attached to an isi device and assigns the priority accordingly.
+---
+ drivers/staging/media/imx/imx8-media-dev.c | 53 +++++++++++++++++++++-
+ 1 file changed, 52 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/staging/media/imx/imx8-media-dev.c b/drivers/staging/media/imx/imx8-media-dev.c
+index 0d0355844eab..49307a63fbea 100644
+--- a/drivers/staging/media/imx/imx8-media-dev.c
++++ b/drivers/staging/media/imx/imx8-media-dev.c
+@@ -71,6 +71,7 @@ struct mxc_isi_info {
+ 	char vdev_name[MXC_NAME_LENS];
+ 	char sd_name[MXC_NAME_LENS];
+ 	int id;
++	struct v4l2_prio_state prio_state;
+ };
+ 
+ struct mxc_mipi_csi2_info {
+@@ -592,7 +593,7 @@ static int subdev_notifier_bound(struct v4l2_async_notifier *notifier,
+ static int subdev_notifier_complete(struct v4l2_async_notifier *notifier)
+ {
+ 	struct mxc_md *mxc_md = notifier_to_mxc_md(notifier);
+-	int ret;
++	int ret,i;
+ 
+ 	dev_dbg(&mxc_md->pdev->dev, "%s\n", __func__);
+ 	mutex_lock(&mxc_md->media_dev.graph_mutex);
+@@ -604,6 +605,56 @@ static int subdev_notifier_complete(struct v4l2_async_notifier *notifier)
+ 	mxc_md->link_status = 1;
+ 
+ 	ret = v4l2_device_register_subdev_nodes(&mxc_md->v4l2_dev);
++
++	if (ret < 0)
++		goto unlock;
++
++	for (i = 0; i < MXC_ISI_MAX_DEVS; i++)
++	{
++		struct mxc_isi_info *mxc_isi = &mxc_md->mxc_isi[i];
++		struct media_graph graph;
++		struct media_entity *next_entity;
++
++
++		if (mxc_isi->sd == NULL)
++			continue;
++
++		dev_dbg(&mxc_md->pdev->dev,"Start graph walk isi %d\n",i);
++
++		ret = media_graph_walk_init(&graph,&mxc_md->media_dev);
++
++		if (ret < 0)
++			continue;
++
++		media_graph_walk_start(&graph,&mxc_isi->sd->entity);
++
++		while ((next_entity = media_graph_walk_next(&graph)))
++		{
++			if (is_media_entity_v4l2_subdev(next_entity))
++			{
++				struct v4l2_subdev *sd = container_of(next_entity,struct v4l2_subdev, entity);
++
++
++				if (sd->devnode != NULL)
++				{
++					dev_dbg(&mxc_md->pdev->dev,"Setting prio for v4l2 subdev %s\n",sd->name);
++					sd->devnode->prio = &mxc_isi->prio_state;
++				}
++			}
++			else if (is_media_entity_v4l2_video_device(next_entity))
++			{
++				struct video_device *vdev = container_of(next_entity,struct video_device, entity);
++
++				dev_dbg(&mxc_md->pdev->dev,"Setting prio for video device %s\n",vdev->name);
++
++				vdev->prio = &mxc_isi->prio_state;
++			}
++		}
++
++		media_graph_walk_cleanup(&graph);
++	}
++
++
+ unlock:
+ 	mutex_unlock(&mxc_md->media_dev.graph_mutex);
+ 	if (ret < 0) {
+-- 
+2.17.1
+
