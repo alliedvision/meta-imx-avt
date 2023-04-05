@@ -1,0 +1,85 @@
+From 3b80e173ea2e1f5b853f4710f1ec45ccc63555b1 Mon Sep 17 00:00:00 2001
+From: Dennis Langenkamp <dennis.langenkamp@alliedvision.com>
+Date: Wed, 5 Apr 2023 11:04:15 +0200
+Subject: [PATCH 27/27] isi capture: Fixed issues found in review
+
+- mxc_isi_cap_enum_fmt: free avail_fmts formats and reset it to NULL if an error occurs
+- Coding style
+---
+ drivers/staging/media/imx/imx8-isi-cap.c | 26 +++++++++++++++++-------
+ 1 file changed, 19 insertions(+), 7 deletions(-)
+
+diff --git a/drivers/staging/media/imx/imx8-isi-cap.c b/drivers/staging/media/imx/imx8-isi-cap.c
+index 2d0994340195..a9e34fb4e40a 100644
+--- a/drivers/staging/media/imx/imx8-isi-cap.c
++++ b/drivers/staging/media/imx/imx8-isi-cap.c
+@@ -909,6 +909,7 @@ static int mxc_isi_cap_enum_fmt(struct file *file, void *priv,
+ {
+ 	struct mxc_isi_cap_dev *isi_cap = video_drvdata(file);
+ 	struct mxc_isi_fmt *fmt;
++	int err;
+ 
+ 	dev_dbg(&isi_cap->pdev->dev, "%s\n", __func__);
+ 
+@@ -922,7 +923,7 @@ static int mxc_isi_cap_enum_fmt(struct file *file, void *priv,
+ 
+ 		isi_cap->avail_fmts = kcalloc(mxc_isi_out_formats_size,sizeof(*isi_cap->avail_fmts),GFP_KERNEL);
+ 
+-		if (!isi_cap->avail_fmts)
++		if (isi_cap->avail_fmts == NULL)
+ 		{
+ 			return -ENOMEM;
+ 		}
+@@ -931,18 +932,21 @@ static int mxc_isi_cap_enum_fmt(struct file *file, void *priv,
+ 		if (!source_pad) {
+ 			v4l2_err(&isi_cap->sd,
+ 				 "%s, No remote pad found!\n", __func__);
+-			return -EINVAL;
++			err = -EINVAL;
++			goto err_free;
+ 		}
+ 
+ 		src_sd = mxc_get_remote_subdev(&isi_cap->sd, __func__);
+-		if (!src_sd)
+-			return -EINVAL;
++		if (!src_sd) {
++			err = -EINVAL;
++			goto err_free;
++		}
+ 
+ 		sd_state = v4l2_subdev_alloc_state(src_sd);
+ 
+-		if (!sd_state)
+-		{
+-			return -ENOMEM;
++		if (!sd_state) {
++			err = -ENOMEM;
++			goto err_free;
+ 		}
+ 
+ 		for (i = 0,j = 0;i < mxc_isi_out_formats_size;i++)
+@@ -977,6 +981,11 @@ static int mxc_isi_cap_enum_fmt(struct file *file, void *priv,
+ 	f->pixelformat = fmt->fourcc;
+ 
+ 	return 0;
++
++err_free:
++	kfree(isi_cap->avail_fmts);
++	isi_cap->avail_fmts = NULL;
++	return err;
+ }
+ 
+ static int mxc_isi_cap_g_fmt_mplane(struct file *file, void *fh,
+@@ -2041,6 +2050,9 @@ static int isi_cap_remove(struct platform_device *pdev)
+ 	struct mxc_isi_cap_dev *isi_cap = platform_get_drvdata(pdev);
+ 	struct v4l2_subdev *sd = &isi_cap->sd;
+ 
++	kfree(isi_cap->avail_fmts);
++	isi_cap->avail_fmts = NULL;
++
+ 	v4l2_device_unregister_subdev(sd);
+ 	media_entity_cleanup(&sd->entity);
+ 	v4l2_set_subdevdata(sd, NULL);
+-- 
+2.40.0
+
