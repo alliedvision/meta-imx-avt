@@ -22,8 +22,8 @@ and cc: the maintainer:
 
 Maintainer: Dennis Langenkamp
 
-Adding the meta-freescale-avt layer to your build
+Adding the meta-imx-avt layer to your build
 =================================================
 
-Run 'bitbake-layers add-layer meta-freescale-avt'
+Run 'bitbake-layers add-layer meta-imx-avt'
 
