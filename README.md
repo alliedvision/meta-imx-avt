@@ -20,7 +20,7 @@ Patches
 Please submit any patches against the meta-imx-avt layer to the xxxx mailing list (xxxx@zzzz.org)
 and cc: the maintainer:
 
-Maintainer: Dennis Langenkamp <dennis.langenkamp@alliedvision.com>
+Maintainer: Dennis Langenkamp
 
 Adding the meta-freescale-avt layer to your build
 =================================================
