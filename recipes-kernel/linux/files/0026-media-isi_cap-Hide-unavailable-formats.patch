@@ -406,7 +406,7 @@ index 4ef05854d859..2d0994340195 100644
  					      &pix->height, 16, ISI_8K, 0, 0);
 -	else
 +		else
-         	v4l_bound_align_image(&pix->width, 16, ISI_8K, fmt->align,
+         	v4l_bound_align_image(&pix->width, 16, ISI_4K, fmt->align,
 -                              &pix->height, 16, ISI_8K, 0, 0);
 -
 -        pix->num_planes = fmt->memplanes;
