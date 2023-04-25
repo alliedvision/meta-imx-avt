@@ -26,6 +26,7 @@ SRC_URI += " \
            	file://0025-GenICam-for-CSI2-for-the-i.MX8M-Plus.patch \
 		file://0026-media-isi_cap-Hide-unavailable-formats.patch \
 		file://0027-isi-capture-Fixed-issues-found-in-review.patch \
+		file://0028-isi-capture-Fix-UNI-402.patch \
           "
 
 

@@ -1,0 +1,29 @@
+From 67d4dda4984b6aa589d906716700747d14401585 Mon Sep 17 00:00:00 2001
+From: Dennis Langenkamp <dennis.langenkamp@alliedvision.com>
+Date: Tue, 25 Apr 2023 14:27:41 +0200
+Subject: [PATCH 28/28] isi capture: Fix UNI-402
+
+If the payload size of a GenICam for CSI2 frame was less than the half of the csi image size, then the data was received correctly. This is fixed by reducing the minimum height to 1 in GenICam for CSI2 mode.
+---
+ drivers/staging/media/imx/imx8-isi-cap.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/staging/media/imx/imx8-isi-cap.c b/drivers/staging/media/imx/imx8-isi-cap.c
+index a9e34fb4e40a..abc10172c87f 100644
+--- a/drivers/staging/media/imx/imx8-isi-cap.c
++++ b/drivers/staging/media/imx/imx8-isi-cap.c
+@@ -1083,9 +1083,9 @@ static int mxc_isi_cap_try_fmt_mplane(struct file *file, void *fh,
+ 		 */
+ 		if (pix->pixelformat == V4L2_PIX_FMT_CUSTOM)
+ 			v4l_bound_align_image(&pix->width, 16, ISI_4K * 3, fmt->align,
+-					      &pix->height, 16, ISI_8K, 0, 0);
++					      &pix->height, 1, ISI_8K, 0, 0);
+ 		else
+-        	v4l_bound_align_image(&pix->width, 16, ISI_4K, fmt->align,
++        		v4l_bound_align_image(&pix->width, 16, ISI_4K, fmt->align,
+ 					      &pix->height, 16, ISI_8K, 0, 0);
+ 
+ 		pix->num_planes = fmt->memplanes;
+-- 
+2.40.0
+
