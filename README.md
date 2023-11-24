@@ -4,6 +4,14 @@
 This layer contains extensions to the layer meta-imx from NXP. 
 It is compatible with the version 5.15.71-2.2.0 of meta-imx.
 
+## Compatibility
+This release is tested with:
+- i.MX 8M Plus EVK with i.MX Yocto Project BSP Rev. 5.15.72-2.2.0
+
+## Getting started
+For getting started please use one of the reference image manifest repositories:
+- i.MX 8M Plus EVK: [alvium-manifest-imx8mpevk](https://github.com/alliedvision/alvium-manifest-imx8mpevk)
+
 
 ## Dependencies
 This layer depends on:
